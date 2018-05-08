@@ -18,31 +18,41 @@ namespace STM32F4DISC_Test
 
             OutputPort resetPort = new OutputPort(Cpu.Pin.GPIO_Pin2, true);
 
+            OutputPort button = new OutputPort(Cpu.Pin.GPIO_Pin0, false);
+
             //OutputPort reset1rt = new OutputPort((Cpu.Pin)24, true);
 
+           // return;
 
             I2CDevice.Configuration config = new I2CDevice.Configuration(121, 400);
             I2CDevice i2C = new I2CDevice(config);
 
             resetPort.Write(true);
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
             resetPort.Write(false);
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
             resetPort.Write(true);
-            Thread.Sleep(1000);
 
-            WriteInit(i2C);
+            resetPort.Read();
+            //Thread.Sleep(1000);
 
-            OutputPort led = new OutputPort((Cpu.Pin)57, true);
+            //GetPorts();
+            //return;
+
+            //WriteInit(i2C);
+
+            OutputPort led = new OutputPort((Cpu.Pin)62, true);
             bool state = true;
 
             while (true)
             {
-                led.Write(state);
-
                 state = !state;
 
-                Thread.Sleep(500);
+                led.Write(state);
+
+                //Thread.Sleep(500);
+
+                WriteInit(i2C);
             }
         }
 
@@ -52,8 +62,8 @@ namespace STM32F4DISC_Test
 
             if (hwProvider != null)
             {
-                Cpu.Pin scl;
-                Cpu.Pin sda;
+                Cpu.Pin scl; //24 - B8
+                Cpu.Pin sda; //25 - B9
 
                 hwProvider.GetI2CPins(out scl, out sda);
 
@@ -72,12 +82,17 @@ namespace STM32F4DISC_Test
         private static void WriteInit(I2CDevice i2C)
         {
             write_i(0xAE, i2C); /*display off*/
+
             write_i(0x00, i2C); /*set lower column address*/
+
             write_i(0x10, i2C); /*set higher column address*/
+
             write_i(0x40, i2C); /*set display start line*/
 
             write_i(0xB0, i2C); /*set page address*/
+
             write_i(0x81, i2C); /*contract control*/
+
             write_i(0xcf, i2C); /*128*/
 
             write_i(0xA1, i2C); /*set segment remap*/
